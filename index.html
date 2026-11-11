@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulador Termodinámico: Gas Ideal y Trabajo | Física Aplicada I (Grupo 4)</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Cabecera Principal y Navegación por Pestañas -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-icon">PV</div>
+        <div class="brand-text">
+          <h1>Simulador de la Ecuación del Gas Ideal y Trabajo</h1>
+          <p>Física Aplicada I &bull; Grupo 4 (Temas 4.2.1, 4.2.2 y 4.2.3)</p>
+        </div>
+      </div>
+
+      <nav class="nav-tabs" aria-label="Selector de Módulos">
+        <button type="button" class="tab-btn active" id="tab-mod1" data-target="module-1">
+          <span>1. Ecuación de Estado (PV = nRT)</span>
+        </button>
+        <button type="button" class="tab-btn" id="tab-mod2" data-target="module-2">
+          <span>2. Procesos Termodinámicos y 1ª Ley</span>
+        </button>
+      </nav>
+
+      <div class="header-badge" title="Constante Universal de los Gases Ideales">
+        R = 8.314 J/(mol&middot;K)
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <!-- =========================================================================
+         MÓDULO 1: ECUACIÓN DE ESTADO DEL GAS IDEAL (DESPEJE AUTOMÁTICO)
+         ========================================================================= -->
+    <section id="module-1" class="module-view active">
+      <div class="workspace-grid">
+        <!-- Columna Izquierda: Controles de Entrada -->
+        <div class="panel">
+          <div class="panel-header">
+            <h2 class="panel-title">Variables de Estado Macroscópicas</h2>
+          </div>
+
+          <div class="instruction-banner">
+            <strong>Despeje Automático:</strong> Ingresa exactamente <strong>3 variables</strong> y deja <strong>1 campo vacío</strong>. El simulador detectará la incógnita y aplicará el despeje algebraico en unidades SI.
+          </div>
+
+          <!-- Alerta de Validación Módulo 1 -->
+          <div id="mod1-alert" class="alert-box" role="alert">
+            <span class="alert-icon">&#9888;</span>
+            <div id="mod1-alert-text"></div>
+          </div>
+
+          <!-- Campo 1: Presión Absoluta (P) -->
+          <div class="field-group" id="fg-p">
+            <div class="field-label-row">
+              <label class="field-label" for="input-p">
+                <span class="var-symbol">P</span> Presión Absoluta
+              </label>
+              <span class="solved-badge">Variable Despejada</span>
+            </div>
+            <div class="input-row">
+              <div class="input-wrapper">
+                <input
+                  type="text"
+                  inputmode="decimal"
+                  id="input-p"
+                  class="num-input"
+                  placeholder="Dejar vacío para despejar P"
+                  autocomplete="off"
+                />
+                <button type="button" class="clear-single-btn" data-clear="input-p" title="Vaciar este campo">&times;</button>
+              </div>
+              <select id="unit-p" class="unit-select" aria-label="Unidad de Presión">
+                <option value="kPa" selected>kPa</option>
+                <option value="Pa">Pa</option>
+                <option value="atm">atm</option>
+              </select>
+            </div>
+            <div class="conversion-hint" id="hint-p">SI: — Pa</div>
+          </div>
+
+          <!-- Campo 2: Volumen (V) -->
+          <div class="field-group" id="fg-v">
+            <div class="field-label-row">
+              <label class="field-label" for="input-v">
+                <span class="var-symbol">V</span> Volumen del Recipiente
+              </label>
+              <span class="solved-badge">Variable Despejada</span>
+            </div>
+            <div class="input-row">
+              <div class="input-wrapper">
+                <input
+                  type="text"
+                  inputmode="decimal"
+                  id="input-v"
+                  class="num-input"
+                  placeholder="Dejar vacío para despejar V"
+                  value="25"
+                  autocomplete="off"
+                />
+                <button type="button" class="clear-single-btn" data-clear="input-v" title="Vaciar este campo">&times;</button>
+              </div>
+              <select id="unit-v" class="unit-select" aria-label="Unidad de Volumen">
+                <option value="L" selected>L</option>
+                <option value="m3">m³</option>
+              </select>
+            </div>
+            <div class="conversion-hint" id="hint-v">SI: 0.025 m³</div>
+          </div>
+
+          <!-- Campo 3: Cantidad de sustancia (n) -->
+          <div class="field-group" id="fg-n">
+            <div class="field-label-row">
+              <label class="field-label" for="input-n">
+                <span class="var-symbol">n</span> Cantidad de Sustancia
+              </label>
+              <span class="solved-badge">Variable Despejada</span>
+            </div>
+            <div class="input-row">
+              <div class="input-wrapper">
+                <input
+                  type="text"
+                  inputmode="decimal"
+                  id="input-n"
+                  class="num-input"
+                  placeholder="Dejar vacío para despejar n"
+                  value="1.0"
+                  autocomplete="off"
+                />
+                <button type="button" class="clear-single-btn" data-clear="input-n" title="Vaciar este campo">&times;</button>
+              </div>
+              <div class="unit-fixed">mol</div>
+            </div>
+            <div class="conversion-hint" id="hint-n">SI: 1.0 mol (N = 6.022 &times; 10²³ moléculas)</div>
+          </div>
+
+          <!-- Campo 4: Temperatura (T) -->
+          <div class="field-group" id="fg-t">
+            <div class="field-label-row">
+              <label class="field-label" for="input-t">
+                <span class="var-symbol">T</span> Temperatura
+              </label>
+              <span class="solved-badge">Variable Despejada</span>
+            </div>
+            <div class="input-row">
+              <div class="input-wrapper">
+                <input
+                  type="text"
+                  inputmode="decimal"
+                  id="input-t"
+                  class="num-input"
+                  placeholder="Dejar vacío para despejar T"
+                  value="27"
+                  autocomplete="off"
+                />
+                <button type="button" class="clear-single-btn" data-clear="input-t" title="Vaciar este campo">&times;</button>
+              </div>
+              <select id="unit-t" class="unit-select" aria-label="Unidad de Temperatura">
+                <option value="C" selected>°C</option>
+                <option value="K">K</option>
+              </select>
+            </div>
+            <div class="conversion-hint" id="hint-t">Conversión SI: T(K) = 27 + 273.15 = 300.15 K</div>
+          </div>
+
+          <!-- Botones de Acción -->
+          <div class="btn-row">
+            <button type="button" id="btn-calc-mod1" class="btn-primary">
+              Calcular Variable Faltante
+            </button>
+            <button type="button" id="btn-clear-mod1" class="btn-secondary">
+              Limpiar campos
+            </button>
+          </div>
+
+          <!-- Casos de Prueba Rápidos para Exposición -->
+          <div class="presets-bar">
+            <div class="presets-title">Casos de Prueba Rápidos (1 incógnita):</div>
+            <div class="preset-chips">
+              <button type="button" class="chip-btn" data-preset-mod1="solveP">Despejar P</button>
+              <button type="button" class="chip-btn" data-preset-mod1="solveV">Despejar V (CNPT)</button>
+              <button type="button" class="chip-btn" data-preset-mod1="solveN">Despejar n (Tanque)</button>
+              <button type="button" class="chip-btn" data-preset-mod1="solveT">Despejar T</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Columna Derecha: Cilindro Interactivo y Despeje Matemático -->
+        <div class="right-column">
+          <!-- Tarjeta de Resolución Matemática Paso a Paso -->
+          <div class="panel">
+            <div class="panel-header">
+              <h2 class="panel-title">Resolución Matemática y Despeje (SI)</h2>
+              <span class="header-badge" id="mod1-solved-tag">Incógnita: P</span>
+            </div>
+
+            <div class="math-steps-grid">
+              <div class="math-step-card">
+                <div>
+                  <div class="step-badge">1. Ecuación Original</div>
+                  <div class="formula-box" id="mod1-step-orig">
+                    P &middot; V = n &middot; R &middot; T
+                  </div>
+                </div>
+                <div class="step-note">Ley de los Gases Ideales</div>
+              </div>
+
+              <div class="math-step-card">
+                <div>
+                  <div class="step-badge">2. Despeje Algebraico</div>
+                  <div class="formula-box" id="mod1-step-algebra">
+                    P = <span class="frac"><span class="num">n &middot; R &middot; T</span><span class="den">V</span></span>
+                  </div>
+                </div>
+                <div class="step-note" id="mod1-step-conv-note">Unidades convertidas al SI</div>
+              </div>
+
+              <div class="math-step-card">
+                <div>
+                  <div class="step-badge">3. Sustitución en SI</div>
+                  <div class="formula-box" id="mod1-step-sub">
+                    —
+                  </div>
+                </div>
+                <div class="step-note">R = 8.314 J/(mol&middot;K)</div>
+              </div>
+
+              <div class="math-step-card result-highlight">
+                <div>
+                  <div class="step-badge">4. Resultado Final</div>
+                  <div class="formula-box" id="mod1-step-res">
+                    —
+                  </div>
+                </div>
+                <div class="step-note" id="mod1-step-res-sub">Equivalencia en unidad seleccionada</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Simulación Visual: Cilindro con Émbolo Móvil y Teoría Cinética -->
+          <div class="panel">
+            <div class="panel-header">
+              <h2 class="panel-title">Simulación Cinética Molecular y Cilindro-Émbolo</h2>
+              <span class="header-badge" id="mod1-kinetic-tag">v_rms &prop; &radic;T</span>
+            </div>
+
+            <div class="canvas-wrapper">
+              <canvas id="cylinder-canvas" width="820" height="330"></canvas>
+            </div>
+
+            <div class="kpi-grid">
+              <div class="kpi-card">
+                <div class="kpi-label">Presión (SI)</div>
+                <div class="kpi-value" id="kpi-p-si">— Pa</div>
+                <div class="kpi-sub" id="kpi-p-alt">— kPa | — atm</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-label">Volumen (SI)</div>
+                <div class="kpi-value" id="kpi-v-si">— m³</div>
+                <div class="kpi-sub" id="kpi-v-alt">— L</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-label">Temperatura Absoluta</div>
+                <div class="kpi-value" id="kpi-t-si">— K</div>
+                <div class="kpi-sub" id="kpi-t-alt">— °C</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-label">Moles y Moléculas (N)</div>
+                <div class="kpi-value" id="kpi-n-si">— mol</div>
+                <div class="kpi-sub" id="kpi-n-alt">N = — moléculas</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         MÓDULO 2: PROCESOS TERMODINÁMICOS, TRABAJO (W) Y PRIMERA LEY
+         ========================================================================= -->
+    <section id="module-2" class="module-view">
+      <div class="workspace-grid">
+        <!-- Columna Izquierda: Selector de Proceso y Parámetros -->
+        <div class="panel">
+          <div class="panel-header">
+            <h2 class="panel-title">Configuración del Proceso (1 &rarr; 2)</h2>
+          </div>
+
+          <!-- Alerta de Validación Módulo 2 -->
+          <div id="mod2-alert" class="alert-box" role="alert">
+            <span class="alert-icon">&#9888;</span>
+            <div id="mod2-alert-text"></div>
+          </div>
+
+          <!-- Selector de Proceso Termodinámico (ComboBox) -->
+          <div class="field-group">
+            <div class="field-label-row">
+              <label class="field-label" for="process-select">
+                Proceso Termodinámico
+              </label>
+            </div>
+            <select id="process-select" class="select-control">
+              <option value="isobaric">1. Proceso Isobárico (P = constante, &Delta;P = 0)</option>
+              <option value="isothermal">2. Proceso Isotérmico (T = constante, &Delta;T = 0)</option>
+              <option value="isochoric">3. Proceso Isocórico / Isométrico (V = constante, &Delta;V = 0)</option>
+              <option value="adiabatic">4. Proceso Adiabático (Q = 0, sin transferencia de calor)</option>
+            </select>
+            <div class="conversion-hint" id="process-law-hint">
+              Ley de Charles: V₁ / T₁ = V₂ / T₂ &bull; W = P(V₂ &minus; V₁)
+            </div>
+          </div>
+
+          <!-- Selector de Tipo de Gas Ideal (Monoatómico por defecto / Diatómico) -->
+          <div class="field-group">
+            <div class="field-label-row">
+              <span class="field-label">Tipo de Gas Ideal (Grados de Libertad)</span>
+            </div>
+            <div class="gas-type-toggle">
+              <button type="button" class="gas-radio-btn active" id="gas-mono" data-gastype="mono">
+                Monoatómico (He, Ar)
+                <span>Cv = 3/2 R &bull; Cp = 5/2 R &bull; &gamma; = 1.667</span>
+              </button>
+              <button type="button" class="gas-radio-btn" id="gas-di" data-gastype="di">
+                Diatómico (N₂, O₂, Aire)
+                <span>Cv = 5/2 R &bull; Cp = 7/2 R &bull; &gamma; = 1.400</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Contenedor Dinámico de Campos según el Proceso Seleccionado -->
+          <div id="mod2-dynamic-inputs">
+            <!-- Campo: Cantidad de sustancia (n) - Común a todos los procesos -->
+            <div class="field-group" id="m2-fg-n">
+              <div class="field-label-row">
+                <label class="field-label" for="m2-n">
+                  <span class="var-symbol">n</span> Cantidad de Sustancia
+                </label>
+              </div>
+              <div class="input-row">
+                <div class="input-wrapper">
+                  <input type="text" inputmode="decimal" id="m2-n" class="num-input" value="2.0" autocomplete="off" />
+                </div>
+                <div class="unit-fixed">mol</div>
+              </div>
+            </div>
+
+            <!-- Campo: Presión Constante (P) [Solo Isobárico] -->
+            <div class="field-group" id="m2-fg-p">
+              <div class="field-label-row">
+                <label class="field-label" for="m2-p">
+                  <span class="var-symbol">P</span> Presión Constante (P₁ = P₂)
+                </label>
+              </div>
+              <div class="input-row">
+                <div class="input-wrapper">
+                  <input type="text" inputmode="decimal" id="m2-p" class="num-input" value="150" autocomplete="off" />
+                </div>
+                <select id="m2-unit-p" class="unit-select">
+                  <option value="kPa" selected>kPa</option>
+                  <option value="Pa">Pa</option>
+                  <option value="atm">atm</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Campo: Temperatura Constante (T) [Solo Isotérmico] -->
+            <div class="field-group" id="m2-fg-t" style="display: none;">
+              <div class="field-label-row">
+                <label class="field-label" for="m2-t">
+                  <span class="var-symbol">T</span> Temperatura Constante (T₁ = T₂)
+                </label>
+              </div>
+              <div class="input-row">
+                <div class="input-wrapper">
+                  <input type="text" inputmode="decimal" id="m2-t" class="num-input" value="300" autocomplete="off" />
+                </div>
+                <select id="m2-unit-t" class="unit-select">
+                  <option value="K" selected>K</option>
+                  <option value="C">°C</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Campo: Volumen Constante (V) [Solo Isocórico] -->
+            <div class="field-group" id="m2-fg-v" style="display: none;">
+              <div class="field-label-row">
+                <label class="field-label" for="m2-v">
+                  <span class="var-symbol">V</span> Volumen Constante (V₁ = V₂)
+                </label>
+              </div>
+              <div class="input-row">
+                <div class="input-wrapper">
+                  <input type="text" inputmode="decimal" id="m2-v" class="num-input" value="50" autocomplete="off" />
+                </div>
+                <select id="m2-unit-v" class="unit-select">
+                  <option value="L" selected>L</option>
+                  <option value="m3">m³</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Campo: Temperatura Inicial (T1) [Isocórico y Adiabático] -->
+            <div class="field-group" id="m2-fg-t1" style="display: none;">
+              <div class="field-label-row">
+                <label class="field-label" for="m2-t1">
+                  <span class="var-symbol">T₁</span> Temperatura Inicial (Estado 1)
+                </label>
+              </div>
+              <div class="input-row">
+                <div class="input-wrapper">
+                  <input type="text" inputmode="decimal" id="m2-t1" class="num-input" value="300" autocomplete="off" />
+                </div>
+                <select id="m2-unit-t1" class="unit-select">
+                  <option value="K" selected>K</option>
+                  <option value="C">°C</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Campo: Temperatura Final (T2) [Solo Isocórico] -->
+            <div class="field-group" id="m2-fg-t2" style="display: none;">
+              <div class="field-label-row">
+                <label class="field-label" for="m2-t2">
+                  <span class="var-symbol">T₂</span> Temperatura Final (Estado 2)
+                </label>
+              </div>
+              <div class="input-row">
+                <div class="input-wrapper">
+                  <input type="text" inputmode="decimal" id="m2-t2" class="num-input" value="600" autocomplete="off" />
+                </div>
+                <select id="m2-unit-t2" class="unit-select">
+                  <option value="K" selected>K</option>
+                  <option value="C">°C</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Campo: Volumen Inicial (V1) [Isobárico, Isotérmico y Adiabático] -->
+            <div class="field-group" id="m2-fg-v1">
+              <div class="field-label-row">
+                <label class="field-label" for="m2-v1">
+                  <span class="var-symbol">V₁</span> Volumen Inicial (Estado 1)
+                </label>
+              </div>
+              <div class="input-row">
+                <div class="input-wrapper">
+                  <input type="text" inputmode="decimal" id="m2-v1" class="num-input" value="20" autocomplete="off" />
+                </div>
+                <select id="m2-unit-v1" class="unit-select">
+                  <option value="L" selected>L</option>
+                  <option value="m3">m³</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Campo: Volumen Final (V2) [Isobárico, Isotérmico y Adiabático] -->
+            <div class="field-group" id="m2-fg-v2">
+              <div class="field-label-row">
+                <label class="field-label" for="m2-v2">
+                  <span class="var-symbol">V₂</span> Volumen Final (Estado 2)
+                </label>
+              </div>
+              <div class="input-row">
+                <div class="input-wrapper">
+                  <input type="text" inputmode="decimal" id="m2-v2" class="num-input" value="60" autocomplete="off" />
+                </div>
+                <select id="m2-unit-v2" class="unit-select">
+                  <option value="L" selected>L</option>
+                  <option value="m3">m³</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button type="button" id="btn-calc-mod2" class="btn-primary">
+              Simular Proceso y Graficar P-V
+            </button>
+            <button type="button" id="btn-invert-mod2" class="btn-secondary" title="Invertir Estado 1 y Estado 2 (Expansión <-> Compresión)">
+              Invertir 1 &harr; 2
+            </button>
+          </div>
+
+          <!-- Presets rápidos para demostración -->
+          <div class="presets-bar">
+            <div class="presets-title">Ejemplos de Demostración:</div>
+            <div class="preset-chips">
+              <button type="button" class="chip-btn" data-preset-mod2="exp_isobaric">Expansión Isobárica</button>
+              <button type="button" class="chip-btn" data-preset-mod2="comp_isothermal">Compresión Isotérmica</button>
+              <button type="button" class="chip-btn" data-preset-mod2="heat_isochoric">Calentamiento Isocórico</button>
+              <button type="button" class="chip-btn" data-preset-mod2="exp_adiabatic">Expansión Adiabática</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Columna Derecha: Diagrama P-V, Interpretación y Primera Ley -->
+        <div class="right-column">
+          <!-- Diagrama P-V e Interpretación Automática del Trabajo -->
+          <div class="panel">
+            <div class="panel-header">
+              <h2 class="panel-title">Diagrama P-V Dinámico (Trabajo W = &int; P dV)</h2>
+              <span class="header-badge" id="mod2-proc-badge">Proceso Isobárico</span>
+            </div>
+
+            <div class="canvas-wrapper">
+              <canvas id="pv-canvas" width="820" height="390"></canvas>
+            </div>
+
+            <!-- Etiqueta de Interpretación Física Automática del Signo de W -->
+            <div id="work-interpretation" class="interpretation-banner expansion">
+              <span id="work-interp-text">Expansión: El gas realiza trabajo sobre el entorno (W &gt; 0)</span>
+              <span id="work-interp-val" style="font-family: var(--font-mono);">W = +6,000.00 J</span>
+            </div>
+
+            <!-- KPIs Primera Ley de la Termodinámica (Delta U = Q - W) -->
+            <div class="kpi-grid">
+              <div class="kpi-card">
+                <div class="kpi-label">Trabajo Mecánico (W)</div>
+                <div class="kpi-value" id="m2-kpi-w">— J</div>
+                <div class="kpi-sub" id="m2-kpi-w-sub">— kJ</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-label">Energía Interna (&Delta;U)</div>
+                <div class="kpi-value" id="m2-kpi-du">— J</div>
+                <div class="kpi-sub" id="m2-kpi-du-sub">— kJ</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-label">Calor Transferido (Q)</div>
+                <div class="kpi-value" id="m2-kpi-q">— J</div>
+                <div class="kpi-sub" id="m2-kpi-q-sub">&Delta;U + W</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-label">1ª Ley (&Delta;U = Q &minus; W)</div>
+                <div class="kpi-value" id="m2-kpi-law">Verificado</div>
+                <div class="kpi-sub" id="m2-kpi-law-sub">Conservación de energía</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Desarrollo Matemático y Tabla de Estados (1 y 2) -->
+          <div class="panel">
+            <div class="panel-header">
+              <h2 class="panel-title">Desarrollo Matemático (Primera Ley) y Estados (SI)</h2>
+            </div>
+
+            <div class="math-steps-grid" style="margin-bottom: 1.1rem;">
+              <div class="math-step-card">
+                <div>
+                  <div class="step-badge">1. Variables de Estado (1 &rarr; 2)</div>
+                  <div class="formula-box" id="m2-math-state">—</div>
+                </div>
+                <div class="step-note" id="m2-note-state">Ecuación característica del proceso</div>
+              </div>
+
+              <div class="math-step-card">
+                <div>
+                  <div class="step-badge">2. Trabajo Mecánico (W)</div>
+                  <div class="formula-box" id="m2-math-w">—</div>
+                </div>
+                <div class="step-note" id="m2-note-w">Integral W = &int; P dV (Área bajo la curva)</div>
+              </div>
+
+              <div class="math-step-card">
+                <div>
+                  <div class="step-badge">3. Energía Interna (&Delta;U)</div>
+                  <div class="formula-box" id="m2-math-du">—</div>
+                </div>
+                <div class="step-note" id="m2-note-du">Función de estado: &Delta;U = nCᵥ(T₂ &minus; T₁)</div>
+              </div>
+
+              <div class="math-step-card result-highlight">
+                <div>
+                  <div class="step-badge">4. Calor y 1ª Ley (&Delta;U = Q &minus; W)</div>
+                  <div class="formula-box" id="m2-math-q">—</div>
+                </div>
+                <div class="step-note" id="m2-note-q">Primera Ley de la Termodinámica</div>
+              </div>
+            </div>
+
+            <!-- Tabla Comparativa de Estados -->
+            <table class="state-table">
+              <thead>
+                <tr>
+                  <th>Estado</th>
+                  <th>Presión Absoluta (P)</th>
+                  <th>Volumen (V)</th>
+                  <th>Temperatura Absoluta (T)</th>
+                  <th>En Celsius (°C)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="dot-state-1"></span><strong>Estado Inicial (1)</strong></td>
+                  <td id="tbl-p1">—</td>
+                  <td id="tbl-v1">—</td>
+                  <td id="tbl-t1">—</td>
+                  <td id="tbl-tc1">—</td>
+                </tr>
+                <tr>
+                  <td><span class="dot-state-2"></span><strong>Estado Final (2)</strong></td>
+                  <td id="tbl-p2">—</td>
+                  <td id="tbl-v2">—</td>
+                  <td id="tbl-t2">—</td>
+                  <td id="tbl-tc2">—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
